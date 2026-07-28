@@ -163,11 +163,11 @@
     <div class="two-col">
       <div>
         <label class="field-label">Placa</label>
-        <input class="input" id="fPlate" placeholder="ABC-1234 ou ABC1D23" style="font-family:'JetBrains Mono',monospace;letter-spacing:0.06em" />
+        <input class="input" id="fPlate" placeholder="ABC-1234 ou ABC1D23" style="font-family:'JetBrains Mono',monospace;letter-spacing:0.06em" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" />
       </div>
       <div>
         <label class="field-label">Cliente</label>
-        <input class="input" id="fClientName" placeholder="NOME DO CLIENTE" />
+        <input class="input" id="fClientName" placeholder="NOME DO CLIENTE" style="text-transform:uppercase" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" />
       </div>
     </div>
 
@@ -565,11 +565,8 @@
     fOutroWrap.style.display = fUsuario.value === "Outro" ? "block" : "none";
   });
 
-  fClientName.addEventListener("input", function () {
-    var pos = fClientName.selectionStart;
-    fClientName.value = fClientName.value.toUpperCase();
-    fClientName.setSelectionRange(pos, pos);
-  });
+  // Cliente is displayed in uppercase visually (CSS), converted to uppercase only on save —
+  // rewriting the value on every keystroke caused duplicated letters on some Android keyboards.
   fPlate.addEventListener("input", function () {
     fPlate.value = displayPlate(formatPlate(fPlate.value));
   });
@@ -663,7 +660,7 @@
       var e = entries.find(function (x) { return x.id === editingId; });
       e.plate = plate;
       e.tipoVeiculo = tipoFinal;
-      e.clientName = fClientName.value.trim();
+      e.clientName = fClientName.value.trim().toUpperCase();
       e.servico = fServico.value;
       e.chaveiro = fChaveiro.value;
       e.retirada = fRetirada.value;
@@ -674,7 +671,7 @@
         id: uid(),
         plate: plate,
         tipoVeiculo: tipoFinal,
-        clientName: fClientName.value.trim(),
+        clientName: fClientName.value.trim().toUpperCase(),
         servico: fServico.value,
         chaveiro: fChaveiro.value,
         retirada: fRetirada.value,
