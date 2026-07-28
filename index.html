@@ -40,6 +40,7 @@
   .header { padding: 20px 18px 16px; border-bottom: 3px solid var(--blue-light); background: var(--panel); }
   .title { font-family: 'Oswald', sans-serif; font-size: 26px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; }
   .date { font-family: 'Inter', sans-serif; font-size: 13px; color: var(--text-muted); margin-top: 2px; text-transform: capitalize; }
+  .subnote { font-family: 'Inter', sans-serif; font-size: 11.5px; color: var(--text-faint); margin-top: 2px; }
   .stats { display: flex; gap: 10px; margin-top: 14px; }
   .stat-box { flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 10px 8px; text-align: center; }
   .stat-val { font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 700; }
@@ -49,7 +50,7 @@
   .input { width: 100%; box-sizing: border-box; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border); background: var(--card); color: var(--text); font-size: 15px; outline: none; }
   .select { width: 100%; box-sizing: border-box; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--card-alt); color: var(--text); font-size: 14px; outline: none; }
 
-  .list-wrap { padding: 16px 18px 100px; }
+  .list-wrap { padding: 16px 18px 110px; }
   .empty { text-align: center; color: var(--text-faint); margin-top: 60px; font-size: 14px; }
 
   .table-container { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; background: var(--card); }
@@ -70,13 +71,15 @@
   .row-actions { display: flex; gap: 12px; justify-content: flex-end; }
   .link-btn { background: none; border: none; font-size: 12px; font-weight: 600; padding: 0; }
 
-  .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; padding: 16px; display: flex; gap: 10px; background: linear-gradient(to top, var(--bg) 60%, rgba(10,30,51,0)); }
-  .btn-outline { flex: 1; padding: 15px 0; border-radius: 12px; border: 1px solid var(--blue-light); background: transparent; color: var(--blue-light); font-family: 'Oswald', sans-serif; font-weight: 600; font-size: 15px; text-transform: uppercase; letter-spacing: 0.03em; }
-  .btn-solid { flex: 1.4; padding: 15px 0; border-radius: 12px; border: none; background: var(--blue-light); color: #052038; font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 15px; text-transform: uppercase; letter-spacing: 0.03em; }
+  .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; padding: 16px; display: flex; gap: 8px; background: linear-gradient(to top, var(--bg) 60%, rgba(10,30,51,0)); }
+  .btn-outline { flex: 1; padding: 15px 0; border-radius: 12px; border: 1px solid var(--blue-light); background: transparent; color: var(--blue-light); font-family: 'Oswald', sans-serif; font-weight: 600; font-size: 14px; text-transform: uppercase; letter-spacing: 0.03em; }
+  .btn-outline-chrome { flex: 1; padding: 15px 0; border-radius: 12px; border: 1px solid var(--chrome); background: transparent; color: var(--chrome); font-family: 'Oswald', sans-serif; font-weight: 600; font-size: 14px; text-transform: uppercase; letter-spacing: 0.03em; }
+  .btn-solid { flex: 1.2; padding: 15px 0; border-radius: 12px; border: none; background: var(--blue-light); color: #052038; font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 0.03em; }
 
   .drawer-overlay { position: fixed; inset: 0; background: rgba(4,10,18,0.65); z-index: 50; display: none; align-items: flex-end; }
   .drawer-overlay.open { display: flex; }
   .drawer { background: var(--panel); width: 100%; max-height: 90vh; overflow-y: auto; border-radius: 20px 20px 0 0; padding: 20px 20px 28px; border-top: 3px solid var(--blue-light); }
+  .drawer.history-drawer { border-top-color: var(--chrome); }
   .drawer-handle { width: 40px; height: 4px; background: var(--border); border-radius: 4px; margin: 0 auto 16px; }
   .drawer-title { font-family: 'Oswald', sans-serif; font-size: 22px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.02em; margin: 0 0 18px; }
   .field-label { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin: 14px 0 6px; }
@@ -85,6 +88,10 @@
   .save-btn { margin-top: 20px; width: 100%; padding: 15px 0; border-radius: 12px; border: none; font-family: 'Oswald', sans-serif; font-size: 16px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; background: var(--blue-light); color: #052038; }
 
   .error-banner { margin-top: 16px; padding: 10px 14px; border-radius: 8px; background: rgba(194,74,66,0.13); border: 1px solid var(--red); color: #FFD9D4; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; }
+
+  .history-row { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 14px 4px; background: none; border: none; border-bottom: 1px solid var(--border); text-align: left; }
+  .history-back { background: none; border: none; color: var(--chrome); font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; margin-bottom: 12px; padding: 0; }
+  .history-empty { text-align: center; color: var(--text-faint); font-family: 'Inter', sans-serif; padding: 30px 0; font-size: 14px; }
 
   .print-only { display: none; }
 
@@ -101,10 +108,11 @@
   <div class="header">
     <div class="title">Controle de Veículos</div>
     <div class="date" id="todayLabel"></div>
+    <div class="subnote">Lista contínua — veículos que ainda estão na oficina permanecem aqui entre os dias</div>
     <div class="stats">
       <div class="stat-box"><div class="stat-val" id="statNaoRealizado" style="color:var(--text-muted)">0</div><div class="stat-label">Não realizado</div></div>
       <div class="stat-box"><div class="stat-val" id="statAndamento" style="color:var(--blue-light)">0</div><div class="stat-label">Em andamento</div></div>
-      <div class="stat-box"><div class="stat-val" id="statTotal" style="color:var(--chrome)">0</div><div class="stat-label">Total hoje</div></div>
+      <div class="stat-box"><div class="stat-val" id="statTotal" style="color:var(--chrome)">0</div><div class="stat-label">Total na lista</div></div>
     </div>
   </div>
 
@@ -114,13 +122,14 @@
 
   <div class="list-wrap">
     <div class="empty" id="emptyMsg" style="display:none;">
-      Nenhum veículo registrado ainda hoje.<br />Toque em "+ Novo veículo" para começar.
+      Nenhum veículo na lista no momento.<br />Toque em "+ Novo veículo" para começar.
     </div>
     <div class="table-container" id="tableContainer" style="display:none;">
       <table>
         <thead>
           <tr>
             <th>Placa</th>
+            <th>Dias</th>
             <th>Tipo</th>
             <th>Cliente</th>
             <th>Serviço(s)</th>
@@ -137,13 +146,15 @@
   </div>
 
   <div class="bottom-bar">
-    <button class="btn-outline" id="printBtn">Imprimir relatório</button>
+    <button class="btn-outline-chrome" id="historyBtn">Histórico</button>
+    <button class="btn-outline" id="printBtn">Imprimir</button>
     <button class="btn-solid" id="newBtn">+ Novo veículo</button>
   </div>
 </div>
 
 <div class="print-only" id="printReport"></div>
 
+<!-- New/Edit vehicle drawer -->
 <div class="drawer-overlay" id="drawerOverlay">
   <div class="drawer" onclick="event.stopPropagation()">
     <div class="drawer-handle"></div>
@@ -228,36 +239,119 @@
   </div>
 </div>
 
+<!-- History drawer -->
+<div class="drawer-overlay" id="historyOverlay">
+  <div class="drawer history-drawer" onclick="event.stopPropagation()">
+    <div class="drawer-handle"></div>
+
+    <div id="historyListView">
+      <h2 class="drawer-title">Histórico por data</h2>
+      <div id="historyListBody"></div>
+    </div>
+
+    <div id="historyDetailView" style="display:none;">
+      <button class="history-back" id="historyBackBtn">‹ Voltar para lista de datas</button>
+      <h2 class="drawer-title" id="historyDetailTitle" style="font-size:20px;margin-bottom:4px;"></h2>
+      <div class="subnote" id="historyDetailSubtitle" style="margin-bottom:16px;"></div>
+      <div id="historyDetailTableWrap"></div>
+      <button class="btn-outline-chrome" id="historyPrintBtn" style="width:100%;margin-top:16px;">Imprimir esta data</button>
+    </div>
+  </div>
+</div>
+
 <script>
 (function () {
-  var STORAGE_PREFIX = "controle_veiculos_";
+  var ACTIVE_KEY = "controle_veiculos_ativos";
+  var LAST_DATE_KEY = "controle_veiculos_ultima_data";
+  var HISTORY_INDEX_KEY = "controle_veiculos_historico_index";
+  function historySnapshotKey(date) { return "controle_veiculos_historico_" + date; }
+
   var USUARIOS_OPTIONS = ["Guilherme Marinho", "Eduardo Cristian", "Jean Lange", "Outro"];
   var TIPO_OPTIONS = ["Caminhão", "Cavalo", "Carreta", "Guindaste", "Ônibus", "Outro"];
+  var PLATE_CHAR_RULES = [/[A-Z]/, /[A-Z]/, /[A-Z]/, /[0-9]/, /[0-9A-Z]/, /[0-9]/, /[0-9]/];
+  var PLATE_REGEX = /^[A-Z]{3}[0-9][0-9A-Z][0-9]{2}$/;
+
   var entries = [];
   var search = "";
   var editingId = null;
   var confirmingDeleteId = null;
+  var historyIndex = [];
+  var selectedHistoryDate = null;
+  var historySnapshot = null;
+  var printTarget = null; // null = live list; {date, data} = historical
 
   function todayKey() { return new Date().toISOString().slice(0, 10); }
-  function storageKey() { return STORAGE_PREFIX + todayKey(); }
   function uid() { return Math.random().toString(36).slice(2, 10); }
 
-  function load() {
+  function formatDateLabel(dateKey) {
+    return new Date(dateKey + "T00:00:00").toLocaleDateString("pt-BR", {
+      weekday: "long", day: "2-digit", month: "long", year: "numeric"
+    });
+  }
+  function formatDateShort(dateKey) {
+    return new Date(dateKey + "T00:00:00").toLocaleDateString("pt-BR", {
+      day: "2-digit", month: "2-digit", year: "numeric"
+    });
+  }
+
+  function lsGet(key) {
     try {
-      var raw = localStorage.getItem(storageKey());
-      entries = raw ? JSON.parse(raw) : [];
-    } catch (e) { entries = []; }
+      var raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) { return null; }
   }
-  function persist() {
-    try { localStorage.setItem(storageKey(), JSON.stringify(entries)); } catch (e) {}
+  function lsSet(key, value) {
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
   }
-  function formatPlate(v) { return v.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 7); }
+
+  function loadHistoryIndex() {
+    historyIndex = lsGet(HISTORY_INDEX_KEY) || [];
+    return historyIndex;
+  }
+
+  function saveHistorySnapshot(date, snapshotEntries) {
+    lsSet(historySnapshotKey(date), snapshotEntries);
+    var idx = loadHistoryIndex();
+    var next = idx.slice();
+    var existing = next.find(function (d) { return d.date === date; });
+    if (existing) existing.count = snapshotEntries.length;
+    else next.push({ date: date, count: snapshotEntries.length });
+    next.sort(function (a, b) { return b.date.localeCompare(a.date); });
+    lsSet(HISTORY_INDEX_KEY, next);
+    historyIndex = next;
+  }
+
+  function formatPlate(v) {
+    var raw = v.toUpperCase().replace(/[^A-Z0-9]/g, "");
+    var out = "";
+    for (var i = 0; i < raw.length && out.length < 7; i++) {
+      var ch = raw[i];
+      if (PLATE_CHAR_RULES[out.length].test(ch)) out += ch;
+    }
+    return out;
+  }
   function displayPlate(v) { return v.length === 7 ? v.slice(0, 3) + "-" + v.slice(3) : v; }
   function escapeHtml(s) {
     var div = document.createElement("div");
     div.innerText = s;
     return div.innerHTML;
   }
+
+  function daysInShop(entry, referenceDateKey) {
+    var createdDateKey = new Date(entry.createdAt).toISOString().slice(0, 10);
+    var diffMs = new Date(referenceDateKey) - new Date(createdDateKey);
+    return Math.max(0, Math.round(diffMs / 86400000));
+  }
+  function diasColor(days) {
+    if (days > 7) return "var(--red)";
+    if (days >= 4) return "var(--amber)";
+    return "var(--text-muted)";
+  }
+  function diasLabel(days) {
+    var base = days + " dia" + (days === 1 ? "" : "s");
+    return days > 7 ? "\u26A0 " + base : base;
+  }
+
   function servicoColor(v) {
     if (v === "Em andamento") return "var(--blue-light)";
     if (v === "Finalizado") return "var(--green)";
@@ -278,6 +372,7 @@
     return '<span class="pill" style="border-color:' + color + ';background:' + color + '22;color:' + color + '">' + (escapeHtml(label) || "—") + "</span>";
   }
 
+  // ---- Main render ----
   function render() {
     var filtered = entries.filter(function (e) {
       var q = search.trim().toUpperCase();
@@ -310,9 +405,11 @@
   }
 
   function rowHtml(entry) {
+    var dias = daysInShop(entry, todayKey());
     return (
       '<tr>' +
       '<td class="plate">' + displayPlate(entry.plate) + '</td>' +
+      '<td>' + pillHtml(diasLabel(dias), diasColor(dias)) + '</td>' +
       '<td>' + pillHtml(entry.tipoVeiculo, "var(--chrome)") + '</td>' +
       '<td class="client-name">' + escapeHtml(entry.clientName) + '</td>' +
       '<td>' + pillHtml(entry.servico, servicoColor(entry.servico)) + '</td>' +
@@ -351,12 +448,13 @@
     });
   }
 
-  function renderPrintReport() {
-    var todayLabel = document.getElementById("todayLabel").textContent;
-    var rows = entries.map(function (e) {
+  function tableRowsForPrint(data, referenceDate) {
+    return data.map(function (e) {
+      var dias = daysInShop(e, referenceDate);
       return (
         "<tr>" +
         "<td style='border-bottom:1px solid #ccc;padding:7px 8px;font-family:monospace'>" + displayPlate(e.plate) + "</td>" +
+        "<td style='border-bottom:1px solid #ccc;padding:7px 8px'>" + diasLabel(dias).replace("\u26A0 ", "") + "</td>" +
         "<td style='border-bottom:1px solid #ccc;padding:7px 8px'>" + escapeHtml(e.tipoVeiculo || "") + "</td>" +
         "<td style='border-bottom:1px solid #ccc;padding:7px 8px'>" + escapeHtml(e.clientName) + "</td>" +
         "<td style='border-bottom:1px solid #ccc;padding:7px 8px'>" + escapeHtml(e.servico) + "</td>" +
@@ -367,20 +465,26 @@
         "</tr>"
       );
     }).join("");
+  }
+
+  function renderPrintReport() {
+    var target = printTarget || { date: todayKey(), data: entries };
+    var label = printTarget ? formatDateLabel(printTarget.date) : document.getElementById("todayLabel").textContent;
+    var rows = tableRowsForPrint(target.data, target.date);
 
     document.getElementById("printReport").innerHTML =
       "<div style='padding:0;color:#000;background:#fff'>" +
       "<h1 style='font-family:Georgia,serif;font-size:20px;margin-bottom:2px'>Controle de Veículos</h1>" +
-      "<div style='font-size:12px;color:#555;margin-bottom:14px;text-transform:capitalize'>" + todayLabel + " · " + entries.length + " veículo(s)</div>" +
+      "<div style='font-size:12px;color:#555;margin-bottom:14px;text-transform:capitalize'>" + label + " · " + target.data.length + " veículo(s)</div>" +
       "<table style='width:100%;border-collapse:collapse;font-size:12.5px'>" +
       "<thead><tr>" +
-      ["Placa","Tipo","Cliente","Serviço(s)","Chaveiro","Retirada","Assinatura","Usuário"].map(function(h){
+      ["Placa","Dias","Tipo","Cliente","Serviço(s)","Chaveiro","Retirada","Assinatura","Usuário"].map(function(h){
         return "<th style='text-align:left;border-bottom:2px solid #000;padding:7px 8px'>" + h + "</th>";
       }).join("") +
       "</tr></thead><tbody>" + rows + "</tbody></table></div>";
   }
 
-  // ---- Drawer elements ----
+  // ---- Drawer elements (new/edit) ----
   var overlay = document.getElementById("drawerOverlay");
   var drawerTitle = document.getElementById("drawerTitle");
   var fPlate = document.getElementById("fPlate");
@@ -398,7 +502,6 @@
   var saveBtn = document.getElementById("saveBtn");
   var errorBanner = document.getElementById("errorBanner");
 
-  // populate chaveiro: Ignição, Com cliente, then 01-40
   var chaveiroHtml = '<option value="" disabled hidden>Selecione</option>';
   chaveiroHtml += '<option value="Ignição">Ignição</option>';
   chaveiroHtml += '<option value="Com cliente">Com cliente</option>';
@@ -408,17 +511,14 @@
   }
   fChaveiro.innerHTML = chaveiroHtml;
 
-  // ---- Tipo / Outro ----
   fTipo.addEventListener("change", function () {
     fTipoOutroWrap.style.display = fTipo.value === "Outro" ? "block" : "none";
   });
 
-  // ---- Dependent field rules: Serviço(s) / Retirada / Assinatura ----
   function refreshDependentFields() {
     var servicoDisabled = fServico.value === "Não realizado";
     var retiradaVal = fRetirada.value;
 
-    // Retirada
     fRetirada.disabled = servicoDisabled;
     if (servicoDisabled) {
       fRetirada.innerHTML = '<option value="">Não aplicável</option>';
@@ -432,7 +532,6 @@
     }
     retiradaVal = fRetirada.value;
 
-    // Assinatura
     var assinaturaDisabled = servicoDisabled || retiradaVal === "NÃO";
     fAssinatura.disabled = assinaturaDisabled;
     if (servicoDisabled) {
@@ -462,12 +561,10 @@
   fServico.addEventListener("change", refreshDependentFields);
   fRetirada.addEventListener("change", refreshDependentFields);
 
-  // ---- Usuário criação / Outro ----
   fUsuario.addEventListener("change", function () {
     fOutroWrap.style.display = fUsuario.value === "Outro" ? "block" : "none";
   });
 
-  // ---- Uppercase enforcement ----
   fClientName.addEventListener("input", function () {
     var pos = fClientName.selectionStart;
     fClientName.value = fClientName.value.toUpperCase();
@@ -478,7 +575,9 @@
   });
 
   function validate() {
-    if (fPlate.value.trim().length < 6) return "Necessário informar campo Placa.";
+    var rawPlate = formatPlate(fPlate.value);
+    if (rawPlate.length === 0) return "Necessário informar campo Placa.";
+    if (!PLATE_REGEX.test(rawPlate)) return "Placa inválida. Use o padrão AAA0000 (antigo) ou AAA0A00 (Mercosul).";
     if (!fTipo.value) return "Necessário informar campo Tipo.";
     if (fTipo.value === "Outro" && fTipoOutro.value.trim().length === 0) return "Necessário informar o tipo do veículo.";
     if (fClientName.value.trim().length === 0) return "Necessário informar campo Cliente.";
@@ -590,19 +689,135 @@
   });
 
   document.getElementById("newBtn").addEventListener("click", function () { openDrawer(null); });
-  document.getElementById("printBtn").addEventListener("click", function () { window.print(); });
   document.getElementById("searchInput").addEventListener("input", function (e) {
     search = e.target.value;
     render();
   });
 
-  // ---- Init ----
-  document.getElementById("todayLabel").textContent = new Date().toLocaleDateString("pt-BR", {
-    weekday: "long", day: "2-digit", month: "long", year: "numeric"
+  // ---- Print (live) ----
+  document.getElementById("printBtn").addEventListener("click", function () {
+    printTarget = null;
+    saveHistorySnapshot(todayKey(), entries);
+    renderPrintReport();
+    setTimeout(function () { window.print(); }, 50);
   });
-  refreshDependentFields();
-  load();
-  render();
+
+  // ---- History overlay ----
+  var historyOverlay = document.getElementById("historyOverlay");
+  var historyListView = document.getElementById("historyListView");
+  var historyDetailView = document.getElementById("historyDetailView");
+  var historyListBody = document.getElementById("historyListBody");
+  var historyDetailTitle = document.getElementById("historyDetailTitle");
+  var historyDetailSubtitle = document.getElementById("historyDetailSubtitle");
+  var historyDetailTableWrap = document.getElementById("historyDetailTableWrap");
+
+  function renderHistoryList() {
+    loadHistoryIndex();
+    if (historyIndex.length === 0) {
+      historyListBody.innerHTML = '<div class="history-empty">Ainda não há dias registrados no histórico.<br />Isso vai se formar automaticamente conforme os dias passam.</div>';
+      return;
+    }
+    historyListBody.innerHTML = historyIndex.map(function (h) {
+      return (
+        '<button class="history-row" data-date="' + h.date + '">' +
+        '<span style="font-family:\'Inter\',sans-serif;font-size:15px;color:var(--text)">' + formatDateShort(h.date) + '</span>' +
+        '<span style="display:flex;align-items:center;gap:10px">' +
+        '<span style="font-family:\'JetBrains Mono\',monospace;font-size:13px;color:var(--chrome)">' + h.count + ' veículo' + (h.count === 1 ? '' : 's') + '</span>' +
+        '<span style="color:var(--text-faint)">\u203A</span>' +
+        '</span></button>'
+      );
+    }).join("");
+    historyListBody.querySelectorAll("[data-date]").forEach(function (el) {
+      el.addEventListener("click", function () { openHistoryDate(el.getAttribute("data-date")); });
+    });
+  }
+
+  function openHistoryDate(date) {
+    selectedHistoryDate = date;
+    historySnapshot = lsGet(historySnapshotKey(date)) || [];
+    historyDetailTitle.textContent = formatDateLabel(date);
+    historyDetailSubtitle.textContent = historySnapshot.length + " veículo(s) registrados nesse dia · somente leitura";
+
+    if (historySnapshot.length === 0) {
+      historyDetailTableWrap.innerHTML = '<div class="history-empty">Nenhum veículo registrado nesse dia.</div>';
+    } else {
+      var headers = ["Placa","Dias","Tipo","Cliente","Serviço(s)","Chaveiro","Retirada","Assinatura","Usuário"];
+      var thead = headers.map(function (h) {
+        return '<th style="text-align:left;padding:8px 10px;border-bottom:2px solid var(--chrome);font-family:\'Inter\',sans-serif;font-size:10.5px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;white-space:nowrap">' + h + '</th>';
+      }).join("");
+      var rows = historySnapshot.map(function (entry, i) {
+        var dias = daysInShop(entry, date);
+        return (
+          '<tr style="background:' + (i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.02)') + '">' +
+          '<td style="padding:10px;border-bottom:1px solid var(--border);font-family:\'JetBrains Mono\',monospace;color:var(--blue-light);font-size:13px">' + displayPlate(entry.plate) + '</td>' +
+          '<td style="padding:10px;border-bottom:1px solid var(--border)">' + pillHtml(diasLabel(dias), diasColor(dias)) + '</td>' +
+          '<td style="padding:10px;border-bottom:1px solid var(--border)">' + pillHtml(entry.tipoVeiculo, "var(--chrome)") + '</td>' +
+          '<td style="padding:10px;border-bottom:1px solid var(--border);font-family:\'Oswald\',sans-serif;font-size:14px;font-weight:600;color:var(--text)">' + escapeHtml(entry.clientName) + '</td>' +
+          '<td style="padding:10px;border-bottom:1px solid var(--border)">' + pillHtml(entry.servico, servicoColor(entry.servico)) + '</td>' +
+          '<td style="padding:10px;border-bottom:1px solid var(--border)">' + pillHtml(entry.chaveiro, "var(--chrome)") + '</td>' +
+          '<td style="padding:10px;border-bottom:1px solid var(--border)">' + pillHtml(entry.retirada, retiradaColor(entry.retirada)) + '</td>' +
+          '<td style="padding:10px;border-bottom:1px solid var(--border)">' + pillHtml(entry.assinatura, assinaturaColor(entry.assinatura)) + '</td>' +
+          '<td style="padding:10px;border-bottom:1px solid var(--border);font-size:13px;color:var(--text-muted)">' + escapeHtml(entry.usuarioCriacao || "") + '</td>' +
+          '</tr>'
+        );
+      }).join("");
+      historyDetailTableWrap.innerHTML =
+        '<div style="overflow-x:auto;border:1px solid var(--border);border-radius:12px;background:var(--card)">' +
+        '<table style="width:100%;border-collapse:collapse"><thead><tr>' + thead + '</tr></thead><tbody>' + rows + '</tbody></table></div>';
+    }
+
+    historyListView.style.display = "none";
+    historyDetailView.style.display = "block";
+  }
+
+  document.getElementById("historyBtn").addEventListener("click", function () {
+    selectedHistoryDate = null;
+    historySnapshot = null;
+    historyListView.style.display = "block";
+    historyDetailView.style.display = "none";
+    renderHistoryList();
+    historyOverlay.classList.add("open");
+  });
+  document.getElementById("historyBackBtn").addEventListener("click", function () {
+    selectedHistoryDate = null;
+    historySnapshot = null;
+    historyListView.style.display = "block";
+    historyDetailView.style.display = "none";
+  });
+  historyOverlay.addEventListener("click", function () {
+    historyOverlay.classList.remove("open");
+  });
+  document.getElementById("historyPrintBtn").addEventListener("click", function () {
+    printTarget = { date: selectedHistoryDate, data: historySnapshot || [] };
+    renderPrintReport();
+    setTimeout(function () { window.print(); }, 50);
+  });
+
+  // ---- Persistence + day rollover ----
+  function persist() { lsSet(ACTIVE_KEY, entries); }
+
+  function init() {
+    entries = lsGet(ACTIVE_KEY) || [];
+    var today = todayKey();
+    var lastDate = lsGet(LAST_DATE_KEY);
+
+    if (lastDate && lastDate !== today) {
+      saveHistorySnapshot(lastDate, entries);
+    }
+    if (lastDate !== today) {
+      lsSet(LAST_DATE_KEY, today);
+    }
+    loadHistoryIndex();
+
+    document.getElementById("todayLabel").textContent = new Date().toLocaleDateString("pt-BR", {
+      weekday: "long", day: "2-digit", month: "long", year: "numeric"
+    });
+
+    refreshDependentFields();
+    render();
+  }
+
+  init();
 
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("sw.js").catch(function () {});
