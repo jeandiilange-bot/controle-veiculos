@@ -35,7 +35,7 @@
   select { -webkit-appearance: none; appearance: none; }
   select:disabled { opacity: 0.5; }
 
-  @page { size: A4 landscape; margin: 10mm; }
+  @page { size: A4; margin: 0; }
 
   .header { padding: 20px 18px 16px; border-bottom: 3px solid var(--blue-light); background: var(--panel); }
   .title { font-family: 'Oswald', sans-serif; font-size: 26px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; }
@@ -97,8 +97,19 @@
 
   @media print {
     .no-print, .bottom-bar, .header, .controls { display: none !important; }
-    body, html { background: #fff !important; color: #000; }
+    body, html { background: #fff !important; color: #000; width: 210mm; height: 297mm; margin: 0; padding: 0; }
     .print-only { display: block !important; }
+    .print-only {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 297mm;   /* A4 landscape width */
+      height: 210mm;  /* A4 landscape height */
+      padding: 10mm;
+      box-sizing: border-box;
+      transform-origin: top left;
+      transform: rotate(-90deg) translate(-297mm, 0);
+    }
   }
 </style>
 </head>
