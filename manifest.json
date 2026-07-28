@@ -1,0 +1,14 @@
+{
+  "name": "Controle de Veículos",
+  "short_name": "Controle Veíc.",
+  "description": "Controle diário de veículos, chaveiro, retirada e assinatura de OS",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0A1E33",
+  "theme_color": "#0A1E33",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

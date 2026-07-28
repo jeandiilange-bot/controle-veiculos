@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>Controle de Veículos</title>
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#0A1E33" />
+<link rel="apple-touch-icon" href="icon-192.png" />
+<link rel="icon" href="icon-192.png" />
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap');
+
+  :root {
+    --bg: #0A1E33;
+    --panel: #0F2C4D;
+    --card: #123A5E;
+    --card-alt: #163F66;
+    --card-alt2: #153A5F;
+    --border: #2A5478;
+    --blue: #1B5A9E;
+    --blue-light: #3E8FD0;
+    --chrome: #C7D0D6;
+    --amber: #D9A441;
+    --green: #4F9A6B;
+    --red: #C24A42;
+    --text: #F2F5F7;
+    --text-muted: #9BB0C2;
+    --text-faint: #5F7690;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; }
+  button, input, select { font-family: inherit; }
+  ::placeholder { color: var(--text-faint); }
+  select { -webkit-appearance: none; appearance: none; }
+  select:disabled { opacity: 0.5; }
+
+  @page { size: A4 landscape; margin: 10mm; }
+
+  .header { padding: 20px 18px 16px; border-bottom: 3px solid var(--blue-light); background: var(--panel); }
+  .title { font-family: 'Oswald', sans-serif; font-size: 26px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; }
+  .date { font-family: 'Inter', sans-serif; font-size: 13px; color: var(--text-muted); margin-top: 2px; text-transform: capitalize; }
+  .stats { display: flex; gap: 10px; margin-top: 14px; }
+  .stat-box { flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 10px 8px; text-align: center; }
+  .stat-val { font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 700; }
+  .stat-label { font-family: 'Inter', sans-serif; font-size: 10.5px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px; }
+
+  .controls { padding: 16px 18px 0; }
+  .input { width: 100%; box-sizing: border-box; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border); background: var(--card); color: var(--text); font-size: 15px; outline: none; }
+  .select { width: 100%; box-sizing: border-box; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--card-alt); color: var(--text); font-size: 14px; outline: none; }
+
+  .list-wrap { padding: 16px 18px 100px; }
+  .empty { text-align: center; color: var(--text-faint); margin-top: 60px; font-size: 14px; }
+
+  .table-container { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; background: var(--card); }
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; padding: 10px; border-bottom: 2px solid var(--blue-light); font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
+  th.actions-col { text-align: right; position: sticky; right: 0; background: var(--card); box-shadow: -6px 0 8px -6px rgba(0,0,0,0.4); }
+  td { padding: 12px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+  tr:nth-child(even) td.actions-col { background: var(--card-alt2); }
+  tr:nth-child(odd) td.actions-col { background: var(--card); }
+  td.actions-col { text-align: right; position: sticky; right: 0; box-shadow: -6px 0 8px -6px rgba(0,0,0,0.4); }
+
+  .plate { font-family: 'JetBrains Mono', monospace; color: var(--blue-light); font-size: 14px; letter-spacing: 0.06em; }
+  .client-name { font-family: 'Oswald', sans-serif; font-size: 15.5px; font-weight: 600; min-width: 140px; }
+
+  .pill { border-radius: 999px; padding: 5px 12px; font-size: 12.5px; font-weight: 600; border-width: 1px; border-style: solid; display: inline-block; }
+
+  .row-actions { display: flex; gap: 12px; justify-content: flex-end; }
+  .link-btn { background: none; border: none; font-size: 12px; font-weight: 600; padding: 0; }
+
+  .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; padding: 16px; display: flex; gap: 10px; background: linear-gradient(to top, var(--bg) 60%, rgba(10,30,51,0)); }
+  .btn-outline { flex: 1; padding: 15px 0; border-radius: 12px; border: 1px solid var(--blue-light); background: transparent; color: var(--blue-light); font-family: 'Oswald', sans-serif; font-weight: 600; font-size: 15px; text-transform: uppercase; letter-spacing: 0.03em; }
+  .btn-solid { flex: 1.4; padding: 15px 0; border-radius: 12px; border: none; background: var(--blue-light); color: #052038; font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 15px; text-transform: uppercase; letter-spacing: 0.03em; }
+
+  .drawer-overlay { position: fixed; inset: 0; background: rgba(4,10,18,0.65); z-index: 50; display: none; align-items: flex-end; }
+  .drawer-overlay.open { display: flex; }
+  .drawer { background: var(--panel); width: 100%; max-height: 90vh; overflow-y: auto; border-radius: 20px 20px 0 0; padding: 20px 20px 28px; border-top: 3px solid var(--blue-light); }
+  .drawer-handle { width: 40px; height: 4px; background: var(--border); border-radius: 4px; margin: 0 auto 16px; }
+  .drawer-title { font-family: 'Oswald', sans-serif; font-size: 22px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.02em; margin: 0 0 18px; }
+  .field-label { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin: 14px 0 6px; }
+  .two-col { display: flex; gap: 12px; }
+  .two-col > div { flex: 1; }
+  .save-btn { margin-top: 20px; width: 100%; padding: 15px 0; border-radius: 12px; border: none; font-family: 'Oswald', sans-serif; font-size: 16px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; background: var(--blue-light); color: #052038; }
+
+  .error-banner { margin-top: 16px; padding: 10px 14px; border-radius: 8px; background: rgba(194,74,66,0.13); border: 1px solid var(--red); color: #FFD9D4; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; }
+
+  .print-only { display: none; }
+
+  @media print {
+    .no-print, .bottom-bar, .header, .controls { display: none !important; }
+    body, html { background: #fff !important; color: #000; }
+    .print-only { display: block !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="no-print">
+  <div class="header">
+    <div class="title">Controle de Veículos</div>
+    <div class="date" id="todayLabel"></div>
+    <div class="stats">
+      <div class="stat-box"><div class="stat-val" id="statNaoRealizado" style="color:var(--text-muted)">0</div><div class="stat-label">Não realizado</div></div>
+      <div class="stat-box"><div class="stat-val" id="statAndamento" style="color:var(--blue-light)">0</div><div class="stat-label">Em andamento</div></div>
+      <div class="stat-box"><div class="stat-val" id="statTotal" style="color:var(--chrome)">0</div><div class="stat-label">Total hoje</div></div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <input class="input" id="searchInput" placeholder="Buscar por cliente ou placa..." />
+  </div>
+
+  <div class="list-wrap">
+    <div class="empty" id="emptyMsg" style="display:none;">
+      Nenhum veículo registrado ainda hoje.<br />Toque em "+ Novo veículo" para começar.
+    </div>
+    <div class="table-container" id="tableContainer" style="display:none;">
+      <table>
+        <thead>
+          <tr>
+            <th>Placa</th>
+            <th>Tipo</th>
+            <th>Cliente</th>
+            <th>Serviço(s)</th>
+            <th>Chaveiro</th>
+            <th>Retirada</th>
+            <th>Assinatura</th>
+            <th>Usuário</th>
+            <th class="actions-col">Ações</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="bottom-bar">
+    <button class="btn-outline" id="printBtn">Imprimir relatório</button>
+    <button class="btn-solid" id="newBtn">+ Novo veículo</button>
+  </div>
+</div>
+
+<div class="print-only" id="printReport"></div>
+
+<div class="drawer-overlay" id="drawerOverlay">
+  <div class="drawer" onclick="event.stopPropagation()">
+    <div class="drawer-handle"></div>
+    <h2 class="drawer-title" id="drawerTitle">Novo veículo</h2>
+
+    <div class="two-col">
+      <div>
+        <label class="field-label">Placa</label>
+        <input class="input" id="fPlate" placeholder="ABC-1234 ou ABC1D23" style="font-family:'JetBrains Mono',monospace;letter-spacing:0.06em" />
+      </div>
+      <div>
+        <label class="field-label">Cliente</label>
+        <input class="input" id="fClientName" placeholder="NOME DO CLIENTE" />
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div>
+        <label class="field-label">Tipo</label>
+        <select class="select" id="fTipo">
+          <option value="" disabled hidden>Selecione</option>
+          <option value="Caminhão">Caminhão</option>
+          <option value="Cavalo">Cavalo</option>
+          <option value="Carreta">Carreta</option>
+          <option value="Guindaste">Guindaste</option>
+          <option value="Ônibus">Ônibus</option>
+          <option value="Outro">Outro</option>
+        </select>
+      </div>
+      <div id="fTipoOutroWrap" style="display:none;">
+        <label class="field-label">Qual tipo?</label>
+        <input class="input" id="fTipoOutro" placeholder="Digite o tipo" />
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div>
+        <label class="field-label">Serviço(s)</label>
+        <select class="select" id="fServico">
+          <option>Não realizado</option>
+          <option>Em andamento</option>
+          <option>Finalizado</option>
+        </select>
+      </div>
+      <div>
+        <label class="field-label">Chaveiro</label>
+        <select class="select" id="fChaveiro"></select>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div>
+        <label class="field-label">Retirada</label>
+        <select class="select" id="fRetirada"></select>
+      </div>
+      <div>
+        <label class="field-label">Assinatura</label>
+        <select class="select" id="fAssinatura"></select>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div>
+        <label class="field-label">Usuário criação</label>
+        <select class="select" id="fUsuario">
+          <option value="" disabled hidden>Selecione</option>
+          <option value="Guilherme Marinho">Guilherme Marinho</option>
+          <option value="Eduardo Cristian">Eduardo Cristian</option>
+          <option value="Jean Lange">Jean Lange</option>
+          <option value="Outro">Outro</option>
+        </select>
+      </div>
+      <div id="fOutroWrap" style="display:none;">
+        <label class="field-label">Nome do usuário</label>
+        <input class="input" id="fOutroNome" placeholder="Digite o nome" />
+      </div>
+    </div>
+
+    <div class="error-banner" id="errorBanner" style="display:none;"></div>
+
+    <button class="save-btn" id="saveBtn">Registrar veículo</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  var STORAGE_PREFIX = "controle_veiculos_";
+  var USUARIOS_OPTIONS = ["Guilherme Marinho", "Eduardo Cristian", "Jean Lange", "Outro"];
+  var TIPO_OPTIONS = ["Caminhão", "Cavalo", "Carreta", "Guindaste", "Ônibus", "Outro"];
+  var entries = [];
+  var search = "";
+  var editingId = null;
+  var confirmingDeleteId = null;
+
+  function todayKey() { return new Date().toISOString().slice(0, 10); }
+  function storageKey() { return STORAGE_PREFIX + todayKey(); }
+  function uid() { return Math.random().toString(36).slice(2, 10); }
+
+  function load() {
+    try {
+      var raw = localStorage.getItem(storageKey());
+      entries = raw ? JSON.parse(raw) : [];
+    } catch (e) { entries = []; }
+  }
+  function persist() {
+    try { localStorage.setItem(storageKey(), JSON.stringify(entries)); } catch (e) {}
+  }
+  function formatPlate(v) { return v.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 7); }
+  function displayPlate(v) { return v.length === 7 ? v.slice(0, 3) + "-" + v.slice(3) : v; }
+  function escapeHtml(s) {
+    var div = document.createElement("div");
+    div.innerText = s;
+    return div.innerHTML;
+  }
+  function servicoColor(v) {
+    if (v === "Em andamento") return "var(--blue-light)";
+    if (v === "Finalizado") return "var(--green)";
+    return "var(--text-muted)";
+  }
+  function retiradaColor(v) {
+    if (v === "SIM") return "var(--green)";
+    if (v === "NÃO") return "var(--red)";
+    return "var(--text-faint)";
+  }
+  function assinaturaColor(v) {
+    if (v === "SIM") return "var(--green)";
+    if (v === "NÃO") return "var(--red)";
+    if (v === "###") return "var(--amber)";
+    return "var(--text-faint)";
+  }
+  function pillHtml(label, color) {
+    return '<span class="pill" style="border-color:' + color + ';background:' + color + '22;color:' + color + '">' + (escapeHtml(label) || "—") + "</span>";
+  }
+
+  function render() {
+    var filtered = entries.filter(function (e) {
+      var q = search.trim().toUpperCase();
+      if (!q) return true;
+      return e.clientName.toUpperCase().indexOf(q) !== -1 || e.plate.indexOf(q) !== -1;
+    });
+
+    var countNao = entries.filter(function (e) { return e.servico === "Não realizado"; }).length;
+    var countAnd = entries.filter(function (e) { return e.servico === "Em andamento"; }).length;
+    document.getElementById("statNaoRealizado").textContent = countNao;
+    document.getElementById("statAndamento").textContent = countAnd;
+    document.getElementById("statTotal").textContent = entries.length;
+
+    var emptyMsg = document.getElementById("emptyMsg");
+    var tableContainer = document.getElementById("tableContainer");
+    var tbody = document.getElementById("tableBody");
+
+    if (filtered.length === 0) {
+      emptyMsg.style.display = "block";
+      tableContainer.style.display = "none";
+      tbody.innerHTML = "";
+    } else {
+      emptyMsg.style.display = "none";
+      tableContainer.style.display = "block";
+      tbody.innerHTML = filtered.map(rowHtml).join("");
+    }
+
+    renderPrintReport();
+    attachRowEvents();
+  }
+
+  function rowHtml(entry) {
+    return (
+      '<tr>' +
+      '<td class="plate">' + displayPlate(entry.plate) + '</td>' +
+      '<td>' + pillHtml(entry.tipoVeiculo, "var(--chrome)") + '</td>' +
+      '<td class="client-name">' + escapeHtml(entry.clientName) + '</td>' +
+      '<td>' + pillHtml(entry.servico, servicoColor(entry.servico)) + '</td>' +
+      '<td>' + pillHtml(entry.chaveiro, "var(--chrome)") + '</td>' +
+      '<td>' + pillHtml(entry.retirada, retiradaColor(entry.retirada)) + '</td>' +
+      '<td>' + pillHtml(entry.assinatura, assinaturaColor(entry.assinatura)) + '</td>' +
+      '<td style="font-size:13px;color:var(--text-muted);white-space:nowrap">' + escapeHtml(entry.usuarioCriacao || "") + '</td>' +
+      '<td class="actions-col"><div class="row-actions no-print">' +
+      '<button class="link-btn" data-action="edit" data-id="' + entry.id + '" style="color:var(--blue-light)">Editar</button>' +
+      '<button class="link-btn" data-action="delete" data-id="' + entry.id + '" style="color:var(--text-faint)">Excluir</button>' +
+      '</div></td>' +
+      '</tr>'
+    );
+  }
+
+  function attachRowEvents() {
+    document.querySelectorAll('[data-action="edit"]').forEach(function (el) {
+      el.onclick = function () { openDrawer(el.getAttribute("data-id")); };
+    });
+    document.querySelectorAll('[data-action="delete"]').forEach(function (el) {
+      el.onclick = function () {
+        var id = el.getAttribute("data-id");
+        if (confirmingDeleteId === id) {
+          entries = entries.filter(function (x) { return x.id !== id; });
+          confirmingDeleteId = null;
+          persist(); render();
+        } else {
+          confirmingDeleteId = id;
+          el.textContent = "Confirmar?";
+          el.style.color = "var(--red)";
+          setTimeout(function () {
+            if (confirmingDeleteId === id) { confirmingDeleteId = null; render(); }
+          }, 2500);
+        }
+      };
+    });
+  }
+
+  function renderPrintReport() {
+    var todayLabel = document.getElementById("todayLabel").textContent;
+    var rows = entries.map(function (e) {
+      return (
+        "<tr>" +
+        "<td style='border-bottom:1px solid #ccc;padding:7px 8px;font-family:monospace'>" + displayPlate(e.plate) + "</td>" +
+        "<td style='border-bottom:1px solid #ccc;padding:7px 8px'>" + escapeHtml(e.tipoVeiculo || "") + "</td>" +
+        "<td style='border-bottom:1px solid #ccc;padding:7px 8px'>" + escapeHtml(e.clientName) + "</td>" +
+        "<td style='border-bottom:1px solid #ccc;padding:7px 8px'>" + escapeHtml(e.servico) + "</td>" +
+        "<td style='border-bottom:1px solid #ccc;padding:7px 8px'>" + (e.chaveiro || "—") + "</td>" +
+        "<td style='border-bottom:1px solid #ccc;padding:7px 8px'>" + (e.retirada || "—") + "</td>" +
+        "<td style='border-bottom:1px solid #ccc;padding:7px 8px'>" + (e.assinatura || "—") + "</td>" +
+        "<td style='border-bottom:1px solid #ccc;padding:7px 8px'>" + escapeHtml(e.usuarioCriacao || "") + "</td>" +
+        "</tr>"
+      );
+    }).join("");
+
+    document.getElementById("printReport").innerHTML =
+      "<div style='padding:0;color:#000;background:#fff'>" +
+      "<h1 style='font-family:Georgia,serif;font-size:20px;margin-bottom:2px'>Controle de Veículos</h1>" +
+      "<div style='font-size:12px;color:#555;margin-bottom:14px;text-transform:capitalize'>" + todayLabel + " · " + entries.length + " veículo(s)</div>" +
+      "<table style='width:100%;border-collapse:collapse;font-size:12.5px'>" +
+      "<thead><tr>" +
+      ["Placa","Tipo","Cliente","Serviço(s)","Chaveiro","Retirada","Assinatura","Usuário"].map(function(h){
+        return "<th style='text-align:left;border-bottom:2px solid #000;padding:7px 8px'>" + h + "</th>";
+      }).join("") +
+      "</tr></thead><tbody>" + rows + "</tbody></table></div>";
+  }
+
+  // ---- Drawer elements ----
+  var overlay = document.getElementById("drawerOverlay");
+  var drawerTitle = document.getElementById("drawerTitle");
+  var fPlate = document.getElementById("fPlate");
+  var fClientName = document.getElementById("fClientName");
+  var fTipo = document.getElementById("fTipo");
+  var fTipoOutroWrap = document.getElementById("fTipoOutroWrap");
+  var fTipoOutro = document.getElementById("fTipoOutro");
+  var fServico = document.getElementById("fServico");
+  var fChaveiro = document.getElementById("fChaveiro");
+  var fRetirada = document.getElementById("fRetirada");
+  var fAssinatura = document.getElementById("fAssinatura");
+  var fUsuario = document.getElementById("fUsuario");
+  var fOutroWrap = document.getElementById("fOutroWrap");
+  var fOutroNome = document.getElementById("fOutroNome");
+  var saveBtn = document.getElementById("saveBtn");
+  var errorBanner = document.getElementById("errorBanner");
+
+  // populate chaveiro: Ignição, Com cliente, then 01-40
+  var chaveiroHtml = '<option value="" disabled hidden>Selecione</option>';
+  chaveiroHtml += '<option value="Ignição">Ignição</option>';
+  chaveiroHtml += '<option value="Com cliente">Com cliente</option>';
+  for (var n = 1; n <= 40; n++) {
+    var val = String(n).padStart(2, "0");
+    chaveiroHtml += '<option value="' + val + '">' + val + '</option>';
+  }
+  fChaveiro.innerHTML = chaveiroHtml;
+
+  // ---- Tipo / Outro ----
+  fTipo.addEventListener("change", function () {
+    fTipoOutroWrap.style.display = fTipo.value === "Outro" ? "block" : "none";
+  });
+
+  // ---- Dependent field rules: Serviço(s) / Retirada / Assinatura ----
+  function refreshDependentFields() {
+    var servicoDisabled = fServico.value === "Não realizado";
+    var retiradaVal = fRetirada.value;
+
+    // Retirada
+    fRetirada.disabled = servicoDisabled;
+    if (servicoDisabled) {
+      fRetirada.innerHTML = '<option value="">Não aplicável</option>';
+      fRetirada.value = "";
+    } else if (fRetirada.innerHTML.indexOf("Não aplicável") !== -1 || fRetirada.options.length === 0) {
+      fRetirada.innerHTML =
+        '<option value="" disabled hidden>Selecione</option>' +
+        '<option value="SIM">SIM</option>' +
+        '<option value="NÃO">NÃO</option>' +
+        '<option value="INCERTO">INCERTO</option>';
+    }
+    retiradaVal = fRetirada.value;
+
+    // Assinatura
+    var assinaturaDisabled = servicoDisabled || retiradaVal === "NÃO";
+    fAssinatura.disabled = assinaturaDisabled;
+    if (servicoDisabled) {
+      fAssinatura.innerHTML = '<option value="">Não aplicável</option>';
+      fAssinatura.value = "";
+    } else if (retiradaVal === "NÃO") {
+      fAssinatura.innerHTML = '<option value="###">###</option>';
+      fAssinatura.value = "###";
+    } else if (retiradaVal === "SIM") {
+      var prevA = fAssinatura.value;
+      fAssinatura.innerHTML =
+        '<option value="" disabled hidden>Selecione</option>' +
+        '<option value="SIM">SIM</option>' +
+        '<option value="NÃO">NÃO</option>';
+      fAssinatura.value = (prevA === "SIM" || prevA === "NÃO") ? prevA : "";
+    } else {
+      var prevA2 = fAssinatura.value;
+      fAssinatura.innerHTML =
+        '<option value="" disabled hidden>Selecione</option>' +
+        '<option value="SIM">SIM</option>' +
+        '<option value="NÃO">NÃO</option>' +
+        '<option value="###">###</option>';
+      fAssinatura.value = prevA2 || "";
+    }
+  }
+
+  fServico.addEventListener("change", refreshDependentFields);
+  fRetirada.addEventListener("change", refreshDependentFields);
+
+  // ---- Usuário criação / Outro ----
+  fUsuario.addEventListener("change", function () {
+    fOutroWrap.style.display = fUsuario.value === "Outro" ? "block" : "none";
+  });
+
+  // ---- Uppercase enforcement ----
+  fClientName.addEventListener("input", function () {
+    var pos = fClientName.selectionStart;
+    fClientName.value = fClientName.value.toUpperCase();
+    fClientName.setSelectionRange(pos, pos);
+  });
+  fPlate.addEventListener("input", function () {
+    fPlate.value = displayPlate(formatPlate(fPlate.value));
+  });
+
+  function validate() {
+    if (fPlate.value.trim().length < 6) return "Necessário informar campo Placa.";
+    if (!fTipo.value) return "Necessário informar campo Tipo.";
+    if (fTipo.value === "Outro" && fTipoOutro.value.trim().length === 0) return "Necessário informar o tipo do veículo.";
+    if (fClientName.value.trim().length === 0) return "Necessário informar campo Cliente.";
+    if (!fServico.value) return "Necessário informar campo Serviço(s).";
+    if (!fChaveiro.value) return "Necessário informar campo Chaveiro.";
+    if (fServico.value !== "Não realizado") {
+      if (!fRetirada.value) return "Necessário informar campo Retirada.";
+      if (!fAssinatura.value) return "Necessário informar campo Assinatura.";
+    }
+    if (!fUsuario.value) return "Necessário informar campo Usuário criação.";
+    if (fUsuario.value === "Outro" && fOutroNome.value.trim().length === 0) return "Necessário informar o nome do usuário.";
+    return null;
+  }
+
+  function openDrawer(id) {
+    editingId = id || null;
+    errorBanner.style.display = "none";
+    if (editingId) {
+      var e = entries.find(function (x) { return x.id === editingId; });
+      drawerTitle.textContent = "Editar veículo";
+      saveBtn.textContent = "Salvar alterações";
+      fPlate.value = displayPlate(e.plate);
+      fClientName.value = e.clientName;
+      if (TIPO_OPTIONS.indexOf(e.tipoVeiculo) !== -1) {
+        fTipo.value = e.tipoVeiculo;
+        fTipoOutroWrap.style.display = "none";
+        fTipoOutro.value = "";
+      } else {
+        fTipo.value = "Outro";
+        fTipoOutroWrap.style.display = "block";
+        fTipoOutro.value = e.tipoVeiculo || "";
+      }
+      fServico.value = e.servico;
+      fChaveiro.value = e.chaveiro || "";
+      refreshDependentFields();
+      fRetirada.value = e.retirada || "";
+      refreshDependentFields();
+      fAssinatura.value = e.assinatura || "";
+      if (USUARIOS_OPTIONS.indexOf(e.usuarioCriacao) !== -1) {
+        fUsuario.value = e.usuarioCriacao;
+        fOutroWrap.style.display = "none";
+        fOutroNome.value = "";
+      } else {
+        fUsuario.value = "Outro";
+        fOutroWrap.style.display = "block";
+        fOutroNome.value = e.usuarioCriacao || "";
+      }
+    } else {
+      drawerTitle.textContent = "Novo veículo";
+      saveBtn.textContent = "Registrar veículo";
+      fPlate.value = "";
+      fClientName.value = "";
+      fTipo.value = "";
+      fTipoOutroWrap.style.display = "none";
+      fTipoOutro.value = "";
+      fServico.value = "Não realizado";
+      fChaveiro.value = "";
+      fUsuario.value = "";
+      fOutroWrap.style.display = "none";
+      fOutroNome.value = "";
+      refreshDependentFields();
+    }
+    overlay.classList.add("open");
+  }
+  function closeDrawer() {
+    overlay.classList.remove("open");
+    editingId = null;
+  }
+  overlay.addEventListener("click", closeDrawer);
+
+  saveBtn.addEventListener("click", function () {
+    var err = validate();
+    if (err) {
+      errorBanner.textContent = err;
+      errorBanner.style.display = "block";
+      return;
+    }
+    errorBanner.style.display = "none";
+    var plate = formatPlate(fPlate.value);
+    var usuarioFinal = fUsuario.value === "Outro" ? fOutroNome.value.trim() : fUsuario.value;
+    var tipoFinal = fTipo.value === "Outro" ? fTipoOutro.value.trim() : fTipo.value;
+    if (editingId) {
+      var e = entries.find(function (x) { return x.id === editingId; });
+      e.plate = plate;
+      e.tipoVeiculo = tipoFinal;
+      e.clientName = fClientName.value.trim();
+      e.servico = fServico.value;
+      e.chaveiro = fChaveiro.value;
+      e.retirada = fRetirada.value;
+      e.assinatura = fAssinatura.value;
+      e.usuarioCriacao = usuarioFinal;
+    } else {
+      entries.unshift({
+        id: uid(),
+        plate: plate,
+        tipoVeiculo: tipoFinal,
+        clientName: fClientName.value.trim(),
+        servico: fServico.value,
+        chaveiro: fChaveiro.value,
+        retirada: fRetirada.value,
+        assinatura: fAssinatura.value,
+        usuarioCriacao: usuarioFinal,
+        createdAt: new Date().toISOString()
+      });
+    }
+    persist();
+    closeDrawer();
+    render();
+  });
+
+  document.getElementById("newBtn").addEventListener("click", function () { openDrawer(null); });
+  document.getElementById("printBtn").addEventListener("click", function () { window.print(); });
+  document.getElementById("searchInput").addEventListener("input", function (e) {
+    search = e.target.value;
+    render();
+  });
+
+  // ---- Init ----
+  document.getElementById("todayLabel").textContent = new Date().toLocaleDateString("pt-BR", {
+    weekday: "long", day: "2-digit", month: "long", year: "numeric"
+  });
+  refreshDependentFields();
+  load();
+  render();
+
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("sw.js").catch(function () {});
+  }
+})();
+</script>
+</body>
+</html>
