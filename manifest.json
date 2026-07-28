@@ -1,5 +1,6 @@
 {
   "name": "Controle de Veículos",
+  "id":"/Controle de Veículos",
   "short_name": "Controle Veíc.",
   "description": "Controle diário de veículos, chaveiro, retirada e assinatura de OS",
   "start_url": "./index.html",
