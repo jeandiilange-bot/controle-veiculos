@@ -1,0 +1,51 @@
+name: Build Signed APK
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: Install Bubblewrap CLI
+        run: npm install -g @bubblewrap/cli
+
+      - name: Decode signing keystore
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > android.keystore
+
+      - name: Initialize Bubblewrap project
+        run: |
+          bubblewrap init \
+            --manifest="https://jeandiilange-bot.github.io/controle-veiculos/manifest.json" \
+            --directory=twa-project
+
+      - name: Build signed APK
+        working-directory: twa-project
+        run: |
+          bubblewrap build \
+            --skipPwaValidation \
+            --signingKeyPath=../android.keystore \
+            --signingKeyAlias=controle-veiculos \
+            --signingKeyPassword="${{ secrets.ANDROID_KEY_PASSWORD }}" \
+            --signingKeystorePassword="${{ secrets.ANDROID_KEYSTORE_PASSWORD }}"
+
+      - name: Upload signed APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: controle-veiculos-signed-apk
+          path: twa-project/app-release-signed.apk
