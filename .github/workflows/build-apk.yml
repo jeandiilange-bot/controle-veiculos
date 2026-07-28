@@ -31,9 +31,13 @@ jobs:
         run: |
           echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > android.keystore
 
+      - name: Configure Bubblewrap JDK and Android SDK paths
+        run: |
+          bubblewrap updateConfig --jdkPath="$JAVA_HOME" --androidSdkPath="$ANDROID_HOME"
+
       - name: Initialize Bubblewrap project
         run: |
-          printf 'n\n%s\nn\n%s\n' "$JAVA_HOME" "$ANDROID_HOME" | bubblewrap init \
+          bubblewrap init \
             --manifest="https://jeandiilange-bot.github.io/controle-veiculos/manifest.json" \
             --directory=twa-project
 
