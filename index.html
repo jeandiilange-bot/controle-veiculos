@@ -35,7 +35,7 @@
   select { -webkit-appearance: none; appearance: none; }
   select:disabled { opacity: 0.5; }
 
-  @page { size: A4; margin: 0; }
+  @page { size: A4 landscape; margin: 10mm; }
 
   .header { padding: 20px 18px 16px; border-bottom: 3px solid var(--blue-light); background: var(--panel); }
   .title { font-family: 'Oswald', sans-serif; font-size: 26px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; }
@@ -68,6 +68,17 @@
 
   .pill { border-radius: 999px; padding: 5px 12px; font-size: 12.5px; font-weight: 600; border-width: 1px; border-style: solid; display: inline-block; }
 
+  .vcard { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px; margin-bottom: 12px; }
+  .vcard-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .vcard-plate { font-family: 'JetBrains Mono', monospace; color: var(--blue-light); font-size: 19px; font-weight: 700; letter-spacing: 0.06em; }
+  .vcard-check { width: 26px; height: 26px; flex-shrink: 0; accent-color: var(--blue-light); cursor: pointer; }
+  .vcard-client { font-family: 'Oswald', sans-serif; font-size: 16px; font-weight: 600; margin-top: 4px; }
+  .vcard-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .vcard-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+  .vcard-user { font-size: 12px; color: var(--text-muted); }
+  .vcard-actions { display: flex; gap: 14px; }
+  .vcard.conferido { border-color: var(--green); background: linear-gradient(var(--card), var(--card)) padding-box, var(--card); box-shadow: inset 0 0 0 1px rgba(79,154,107,0.35); }
+
   .row-actions { display: flex; gap: 12px; justify-content: flex-end; }
   .link-btn { background: none; border: none; font-size: 12px; font-weight: 600; padding: 0; }
 
@@ -97,19 +108,8 @@
 
   @media print {
     .no-print, .bottom-bar, .header, .controls { display: none !important; }
-    body, html { background: #fff !important; color: #000; width: 210mm; height: 297mm; margin: 0; padding: 0; }
+    body, html { background: #fff !important; color: #000; }
     .print-only { display: block !important; }
-    .print-only {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 297mm;   /* A4 landscape width */
-      height: 210mm;  /* A4 landscape height */
-      padding: 10mm;
-      box-sizing: border-box;
-      transform-origin: top left;
-      transform: rotate(-90deg) translate(-297mm, 0);
-    }
   }
 </style>
 </head>
@@ -135,25 +135,7 @@
     <div class="empty" id="emptyMsg" style="display:none;">
       Nenhum veículo na lista no momento.<br />Toque em "+ Novo veículo" para começar.
     </div>
-    <div class="table-container" id="tableContainer" style="display:none;">
-      <table>
-        <thead>
-          <tr>
-            <th>Placa</th>
-            <th>Dias</th>
-            <th>Tipo</th>
-            <th>Cliente</th>
-            <th>Serviço(s)</th>
-            <th>Chaveiro</th>
-            <th>Retirada</th>
-            <th>Assinatura</th>
-            <th>Usuário</th>
-            <th class="actions-col">Ações</th>
-          </tr>
-        </thead>
-        <tbody id="tableBody"></tbody>
-      </table>
-    </div>
+    <div id="cardList" style="display:none;"></div>
   </div>
 
   <div class="bottom-bar">
@@ -179,6 +161,7 @@
       <div>
         <label class="field-label">Cliente</label>
         <input class="input" id="fClientName" placeholder="NOME DO CLIENTE" style="text-transform:uppercase" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" />
+        <div id="clienteStatus" style="display:none; font-family:'Inter',sans-serif; font-size:12px; color:var(--text-faint); margin-top:6px;"></div>
       </div>
     </div>
 
@@ -270,6 +253,7 @@
   </div>
 </div>
 
+
 <script>
 (function () {
   var ACTIVE_KEY = "controle_veiculos_ativos";
@@ -348,21 +332,6 @@
     return div.innerHTML;
   }
 
-  function daysInShop(entry, referenceDateKey) {
-    var createdDateKey = new Date(entry.createdAt).toISOString().slice(0, 10);
-    var diffMs = new Date(referenceDateKey) - new Date(createdDateKey);
-    return Math.max(0, Math.round(diffMs / 86400000));
-  }
-  function diasColor(days) {
-    if (days > 7) return "var(--red)";
-    if (days >= 4) return "var(--amber)";
-    return "var(--text-muted)";
-  }
-  function diasLabel(days) {
-    var base = days + " dia" + (days === 1 ? "" : "s");
-    return days > 7 ? "\u26A0 " + base : base;
-  }
-
   function servicoColor(v) {
     if (v === "Em andamento") return "var(--blue-light)";
     if (v === "Finalizado") return "var(--green)";
@@ -384,8 +353,20 @@
   }
 
   // ---- Main render ----
+  function sortOldestFirst(list) {
+    return list.slice().sort(function (a, b) {
+      return new Date(a.createdAt) - new Date(b.createdAt);
+    });
+  }
+
+  function formatPrintedAt() {
+    return new Date().toLocaleString("pt-BR", {
+      day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit"
+    });
+  }
+
   function render() {
-    var filtered = entries.filter(function (e) {
+    var filtered = sortOldestFirst(entries).filter(function (e) {
       var q = search.trim().toUpperCase();
       if (!q) return true;
       return e.clientName.toUpperCase().indexOf(q) !== -1 || e.plate.indexOf(q) !== -1;
@@ -398,47 +379,60 @@
     document.getElementById("statTotal").textContent = entries.length;
 
     var emptyMsg = document.getElementById("emptyMsg");
-    var tableContainer = document.getElementById("tableContainer");
-    var tbody = document.getElementById("tableBody");
+    var cardList = document.getElementById("cardList");
 
     if (filtered.length === 0) {
       emptyMsg.style.display = "block";
-      tableContainer.style.display = "none";
-      tbody.innerHTML = "";
+      cardList.style.display = "none";
+      cardList.innerHTML = "";
     } else {
       emptyMsg.style.display = "none";
-      tableContainer.style.display = "block";
-      tbody.innerHTML = filtered.map(rowHtml).join("");
+      cardList.style.display = "block";
+      cardList.innerHTML = filtered.map(cardHtml).join("");
     }
 
     renderPrintReport();
     attachRowEvents();
   }
 
-  function rowHtml(entry) {
-    var dias = daysInShop(entry, todayKey());
+  function cardHtml(entry) {
+    var checked = entry.conferido ? "checked" : "";
+    var cardClass = entry.conferido ? "vcard conferido" : "vcard";
     return (
-      '<tr>' +
-      '<td class="plate">' + displayPlate(entry.plate) + '</td>' +
-      '<td>' + pillHtml(diasLabel(dias), diasColor(dias)) + '</td>' +
-      '<td>' + pillHtml(entry.tipoVeiculo, "var(--chrome)") + '</td>' +
-      '<td class="client-name">' + escapeHtml(entry.clientName) + '</td>' +
-      '<td>' + pillHtml(entry.servico, servicoColor(entry.servico)) + '</td>' +
-      '<td>' + pillHtml(entry.chaveiro, "var(--chrome)") + '</td>' +
-      '<td>' + pillHtml(entry.retirada, retiradaColor(entry.retirada)) + '</td>' +
-      '<td>' + pillHtml(entry.assinatura, assinaturaColor(entry.assinatura)) + '</td>' +
-      '<td style="font-size:13px;color:var(--text-muted);white-space:nowrap">' + escapeHtml(entry.usuarioCriacao || "") + '</td>' +
-      '<td class="actions-col"><div class="row-actions no-print">' +
+      '<div class="' + cardClass + '">' +
+      '<div class="vcard-top">' +
+      '<span class="vcard-plate">' + displayPlate(entry.plate) + '</span>' +
+      '<input type="checkbox" class="vcard-check" data-action="toggle-conferido" data-id="' + entry.id + '" ' + checked + ' title="Conferido no pátio" />' +
+      '</div>' +
+      '<div class="vcard-client">' + escapeHtml(entry.clientName) + '</div>' +
+      '<div class="vcard-pills">' +
+      pillHtml(entry.tipoVeiculo, "var(--chrome)") +
+      pillHtml(entry.servico, servicoColor(entry.servico)) +
+      pillHtml(entry.chaveiro, "var(--chrome)") +
+      pillHtml(entry.retirada, retiradaColor(entry.retirada)) +
+      pillHtml(entry.assinatura, assinaturaColor(entry.assinatura)) +
+      '</div>' +
+      '<div class="vcard-footer">' +
+      '<span class="vcard-user">' + escapeHtml(entry.usuarioCriacao || "") + '</span>' +
+      '<div class="vcard-actions no-print">' +
       '<button class="link-btn" data-action="edit" data-id="' + entry.id + '" style="color:var(--blue-light)">Editar</button>' +
       '<button class="link-btn" data-action="delete" data-id="' + entry.id + '" style="color:var(--text-faint)">Excluir</button>' +
-      '</div></td>' +
-      '</tr>'
+      '</div>' +
+      '</div>' +
+      '</div>'
     );
   }
 
   function attachRowEvents() {
     document.querySelectorAll('[data-action="edit"]').forEach(function (el) {
       el.onclick = function () { openDrawer(el.getAttribute("data-id")); };
+    });
+    document.querySelectorAll('[data-action="toggle-conferido"]').forEach(function (el) {
+      el.onchange = function () {
+        var id = el.getAttribute("data-id");
+        var e = entries.find(function (x) { return x.id === id; });
+        if (e) { e.conferido = el.checked; persist(); render(); }
+      };
     });
     document.querySelectorAll('[data-action="delete"]').forEach(function (el) {
       el.onclick = function () {
@@ -461,11 +455,9 @@
 
   function tableRowsForPrint(data, referenceDate) {
     return data.map(function (e) {
-      var dias = daysInShop(e, referenceDate);
       return (
         "<tr>" +
         "<td style='border-bottom:1px solid #ccc;padding:7px 8px;font-family:monospace'>" + displayPlate(e.plate) + "</td>" +
-        "<td style='border-bottom:1px solid #ccc;padding:7px 8px'>" + diasLabel(dias).replace("\u26A0 ", "") + "</td>" +
         "<td style='border-bottom:1px solid #ccc;padding:7px 8px'>" + escapeHtml(e.tipoVeiculo || "") + "</td>" +
         "<td style='border-bottom:1px solid #ccc;padding:7px 8px'>" + escapeHtml(e.clientName) + "</td>" +
         "<td style='border-bottom:1px solid #ccc;padding:7px 8px'>" + escapeHtml(e.servico) + "</td>" +
@@ -481,15 +473,17 @@
   function renderPrintReport() {
     var target = printTarget || { date: todayKey(), data: entries };
     var label = printTarget ? formatDateLabel(printTarget.date) : document.getElementById("todayLabel").textContent;
-    var rows = tableRowsForPrint(target.data, target.date);
+    var sortedData = sortOldestFirst(target.data);
+    var rows = tableRowsForPrint(sortedData, target.date);
 
     document.getElementById("printReport").innerHTML =
       "<div style='padding:0;color:#000;background:#fff'>" +
       "<h1 style='font-family:Georgia,serif;font-size:20px;margin-bottom:2px'>Controle de Veículos</h1>" +
-      "<div style='font-size:12px;color:#555;margin-bottom:14px;text-transform:capitalize'>" + label + " · " + target.data.length + " veículo(s)</div>" +
+      "<div style='font-size:12px;color:#555;margin-bottom:2px;text-transform:capitalize'>" + label + " · " + sortedData.length + " veículo(s)</div>" +
+      "<div style='font-size:11px;color:#888;margin-bottom:14px;'>Relatório gerado/impresso em: " + formatPrintedAt() + "</div>" +
       "<table style='width:100%;border-collapse:collapse;font-size:12.5px'>" +
       "<thead><tr>" +
-      ["Placa","Dias","Tipo","Cliente","Serviço(s)","Chaveiro","Retirada","Assinatura","Usuário"].map(function(h){
+      ["Placa","Tipo","Cliente","Serviço(s)","Chaveiro","Retirada","Assinatura","Usuário"].map(function(h){
         return "<th style='text-align:left;border-bottom:2px solid #000;padding:7px 8px'>" + h + "</th>";
       }).join("") +
       "</tr></thead><tbody>" + rows + "</tbody></table></div>";
@@ -580,7 +574,52 @@
   // rewriting the value on every keystroke caused duplicated letters on some Android keyboards.
   fPlate.addEventListener("input", function () {
     fPlate.value = displayPlate(formatPlate(fPlate.value));
+    var rawPlate = formatPlate(fPlate.value);
+    if (PLATE_REGEX.test(rawPlate)) {
+      lookupClienteByPlate(rawPlate);
+    } else {
+      clienteStatus.style.display = "none";
+    }
   });
+
+  // ---- TCar integration: auto-fill Cliente by looking up the plate ----
+  // Consulta um servidor local (server.py) rodando no PC da oficina, que fala
+  // diretamente com o TCar na rede interna — não depende de internet.
+  var TCAR_API_URL = "/api/tcar"; // endpoint relativo: sempre aponta pro mesmo servidor que serviu este app
+
+  var clienteStatus = document.getElementById("clienteStatus");
+  var lastLookupPlate = null;
+
+  function lookupClienteByPlate(plate) {
+    if (plate === lastLookupPlate) return;
+    lastLookupPlate = plate;
+
+    clienteStatus.style.display = "block";
+    clienteStatus.style.color = "var(--text-faint)";
+    clienteStatus.textContent = "Consultando cadastro...";
+
+    var url = TCAR_API_URL + "?placa=" + encodeURIComponent(plate);
+
+    fetch(url)
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        if (data && data.nome) {
+          fClientName.value = String(data.nome).toUpperCase();
+          clienteStatus.style.color = "var(--green)";
+          clienteStatus.textContent = "Cliente encontrado automaticamente.";
+        } else if (data && data.notFound) {
+          clienteStatus.style.color = "var(--amber)";
+          clienteStatus.textContent = "Cadastro não localizado.";
+        } else {
+          clienteStatus.style.color = "var(--red)";
+          clienteStatus.textContent = "Não foi possível consultar agora. Preencha o cliente manualmente.";
+        }
+      })
+      .catch(function () {
+        clienteStatus.style.color = "var(--red)";
+        clienteStatus.textContent = "Não foi possível consultar agora. Preencha o cliente manualmente.";
+      });
+  }
 
   function validate() {
     var rawPlate = formatPlate(fPlate.value);
@@ -603,6 +642,9 @@
   function openDrawer(id) {
     editingId = id || null;
     errorBanner.style.display = "none";
+    clienteStatus.style.display = "none";
+    clienteStatus.textContent = "";
+    lastLookupPlate = null;
     if (editingId) {
       var e = entries.find(function (x) { return x.id === editingId; });
       drawerTitle.textContent = "Editar veículo";
@@ -688,6 +730,7 @@
         retirada: fRetirada.value,
         assinatura: fAssinatura.value,
         usuarioCriacao: usuarioFinal,
+        conferido: false,
         createdAt: new Date().toISOString()
       });
     }
@@ -742,23 +785,21 @@
 
   function openHistoryDate(date) {
     selectedHistoryDate = date;
-    historySnapshot = lsGet(historySnapshotKey(date)) || [];
+    historySnapshot = sortOldestFirst(lsGet(historySnapshotKey(date)) || []);
     historyDetailTitle.textContent = formatDateLabel(date);
     historyDetailSubtitle.textContent = historySnapshot.length + " veículo(s) registrados nesse dia · somente leitura";
 
     if (historySnapshot.length === 0) {
       historyDetailTableWrap.innerHTML = '<div class="history-empty">Nenhum veículo registrado nesse dia.</div>';
     } else {
-      var headers = ["Placa","Dias","Tipo","Cliente","Serviço(s)","Chaveiro","Retirada","Assinatura","Usuário"];
+      var headers = ["Placa","Tipo","Cliente","Serviço(s)","Chaveiro","Retirada","Assinatura","Usuário"];
       var thead = headers.map(function (h) {
         return '<th style="text-align:left;padding:8px 10px;border-bottom:2px solid var(--chrome);font-family:\'Inter\',sans-serif;font-size:10.5px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;white-space:nowrap">' + h + '</th>';
       }).join("");
       var rows = historySnapshot.map(function (entry, i) {
-        var dias = daysInShop(entry, date);
         return (
           '<tr style="background:' + (i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.02)') + '">' +
           '<td style="padding:10px;border-bottom:1px solid var(--border);font-family:\'JetBrains Mono\',monospace;color:var(--blue-light);font-size:13px">' + displayPlate(entry.plate) + '</td>' +
-          '<td style="padding:10px;border-bottom:1px solid var(--border)">' + pillHtml(diasLabel(dias), diasColor(dias)) + '</td>' +
           '<td style="padding:10px;border-bottom:1px solid var(--border)">' + pillHtml(entry.tipoVeiculo, "var(--chrome)") + '</td>' +
           '<td style="padding:10px;border-bottom:1px solid var(--border);font-family:\'Oswald\',sans-serif;font-size:14px;font-weight:600;color:var(--text)">' + escapeHtml(entry.clientName) + '</td>' +
           '<td style="padding:10px;border-bottom:1px solid var(--border)">' + pillHtml(entry.servico, servicoColor(entry.servico)) + '</td>' +
