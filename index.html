@@ -576,16 +576,51 @@
     fPlate.value = displayPlate(formatPlate(fPlate.value));
     var rawPlate = formatPlate(fPlate.value);
     if (PLATE_REGEX.test(rawPlate)) {
+      buscarClienteNoHistorico(rawPlate);
       lookupClienteByPlate(rawPlate);
     } else {
       clienteStatus.style.display = "none";
     }
   });
 
+  // ---- Preenchimento automático usando o histórico do próprio app ----
+  // Procura a placa na lista ativa e em todos os dias salvos no histórico,
+  // e preenche o Cliente com o registro mais recente encontrado. Não depende
+  // de nenhum servidor — funciona 100% offline, com os dados que o app já tem.
+  function buscarClienteNoHistorico(plate) {
+    var candidatos = [];
+
+    entries.forEach(function (e) {
+      if (e.plate === plate) candidatos.push(e);
+    });
+
+    loadHistoryIndex().forEach(function (h) {
+      var snap = lsGet(historySnapshotKey(h.date));
+      if (snap) {
+        snap.forEach(function (e) {
+          if (e.plate === plate) candidatos.push(e);
+        });
+      }
+    });
+
+    if (candidatos.length === 0) return;
+
+    candidatos.sort(function (a, b) { return new Date(b.createdAt) - new Date(a.createdAt); });
+    var maisRecente = candidatos[0];
+
+    if (maisRecente.clientName) {
+      fClientName.value = String(maisRecente.clientName).toUpperCase();
+      clienteStatus.style.display = "block";
+      clienteStatus.style.color = "var(--blue-light)";
+      clienteStatus.textContent = "Cliente preenchido com base no histórico — confira antes de salvar.";
+    }
+  }
+
   // ---- TCar integration: auto-fill Cliente by looking up the plate ----
   // Desativado nessa versão (hospedada no GitHub Pages) — a consulta ao TCar
   // só funciona quando o app roda pelo servidor local (na rede da oficina).
   // Preencher TCAR_API_URL reativa a tentativa de consulta automaticamente.
+  // Quando ativa, tem prioridade sobre o histórico (dado mais atualizado).
   var TCAR_API_URL = "";
 
   var clienteStatus = document.getElementById("clienteStatus");
@@ -612,14 +647,11 @@
         } else if (data && data.notFound) {
           clienteStatus.style.color = "var(--amber)";
           clienteStatus.textContent = "Cadastro não localizado.";
-        } else {
-          clienteStatus.style.color = "var(--red)";
-          clienteStatus.textContent = "Não foi possível consultar agora. Preencha o cliente manualmente.";
         }
+        // se a consulta externa não achar nada, mantém o que já veio do histórico (se houver)
       })
       .catch(function () {
-        clienteStatus.style.color = "var(--red)";
-        clienteStatus.textContent = "Não foi possível consultar agora. Preencha o cliente manualmente.";
+        // silencioso — o preenchimento pelo histórico local (se houve) já cobre esse caso
       });
   }
 
