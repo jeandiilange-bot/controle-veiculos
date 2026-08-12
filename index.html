@@ -353,9 +353,9 @@
   }
 
   // ---- Main render ----
-  function sortOldestFirst(list) {
+  function sortByPlate(list) {
     return list.slice().sort(function (a, b) {
-      return new Date(a.createdAt) - new Date(b.createdAt);
+      return displayPlate(a.plate).localeCompare(displayPlate(b.plate), "pt-BR");
     });
   }
 
@@ -366,7 +366,7 @@
   }
 
   function render() {
-    var filtered = sortOldestFirst(entries).filter(function (e) {
+    var filtered = sortByPlate(entries).filter(function (e) {
       var q = search.trim().toUpperCase();
       if (!q) return true;
       return e.clientName.toUpperCase().indexOf(q) !== -1 || e.plate.indexOf(q) !== -1;
@@ -473,7 +473,7 @@
   function renderPrintReport() {
     var target = printTarget || { date: todayKey(), data: entries };
     var label = printTarget ? formatDateLabel(printTarget.date) : document.getElementById("todayLabel").textContent;
-    var sortedData = sortOldestFirst(target.data);
+    var sortedData = sortByPlate(target.data);
     var rows = tableRowsForPrint(sortedData, target.date);
 
     document.getElementById("printReport").innerHTML =
@@ -583,14 +583,16 @@
   });
 
   // ---- TCar integration: auto-fill Cliente by looking up the plate ----
-  // Consulta um servidor local (server.py) rodando no PC da oficina, que fala
-  // diretamente com o TCar na rede interna — não depende de internet.
-  var TCAR_API_URL = "/api/tcar"; // endpoint relativo: sempre aponta pro mesmo servidor que serviu este app
+  // Desativado nessa versão (hospedada no GitHub Pages) — a consulta ao TCar
+  // só funciona quando o app roda pelo servidor local (na rede da oficina).
+  // Preencher TCAR_API_URL reativa a tentativa de consulta automaticamente.
+  var TCAR_API_URL = "";
 
   var clienteStatus = document.getElementById("clienteStatus");
   var lastLookupPlate = null;
 
   function lookupClienteByPlate(plate) {
+    if (!TCAR_API_URL) return; // integração desativada nessa versão
     if (plate === lastLookupPlate) return;
     lastLookupPlate = plate;
 
@@ -785,7 +787,7 @@
 
   function openHistoryDate(date) {
     selectedHistoryDate = date;
-    historySnapshot = sortOldestFirst(lsGet(historySnapshotKey(date)) || []);
+    historySnapshot = sortByPlate(lsGet(historySnapshotKey(date)) || []);
     historyDetailTitle.textContent = formatDateLabel(date);
     historyDetailSubtitle.textContent = historySnapshot.length + " veículo(s) registrados nesse dia · somente leitura";
 
