@@ -240,6 +240,20 @@
 
     <div id="historyListView">
       <h2 class="drawer-title">Histórico por data</h2>
+
+      <div style="background:var(--card); border:1px solid var(--border); border-radius:12px; padding:14px; margin-bottom:18px;">
+        <div style="font-family:'Oswald',sans-serif; font-size:14px; font-weight:600; text-transform:uppercase; letter-spacing:0.03em; color:var(--chrome); margin-bottom:4px;">
+          Base de clientes (opcional)
+        </div>
+        <div id="baseClientesStatus" style="font-family:'Inter',sans-serif; font-size:12.5px; color:var(--text-faint); margin-bottom:10px;">
+          Nenhuma base importada ainda.
+        </div>
+        <button class="btn-outline-chrome" id="importarBaseBtn" style="width:100%; padding:11px 0; font-size:13px;">
+          Importar planilha (.xlsx / .csv)
+        </button>
+        <input type="file" id="importarBaseInput" accept=".xlsx,.xls,.csv" style="display:none;" />
+      </div>
+
       <div id="historyListBody"></div>
     </div>
 
@@ -253,7 +267,7 @@
   </div>
 </div>
 
-
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
 (function () {
   var ACTIVE_KEY = "controle_veiculos_ativos";
@@ -588,6 +602,17 @@
   // e preenche o Cliente com o registro mais recente encontrado. Não depende
   // de nenhum servidor — funciona 100% offline, com os dados que o app já tem.
   function buscarClienteNoHistorico(plate) {
+    // 1) Base importada do TCar (mais confiável, atualizada manualmente) tem prioridade
+    var base = lsGet(BASE_CLIENTES_KEY);
+    if (base && base[plate]) {
+      fClientName.value = String(base[plate]).toUpperCase();
+      clienteStatus.style.display = "block";
+      clienteStatus.style.color = "var(--green)";
+      clienteStatus.textContent = "Cliente encontrado na base importada — confira antes de salvar.";
+      return;
+    }
+
+    // 2) Histórico interno do próprio app (fallback)
     var candidatos = [];
 
     entries.forEach(function (e) {
@@ -615,6 +640,112 @@
       clienteStatus.textContent = "Cliente preenchido com base no histórico — confira antes de salvar.";
     }
   }
+
+  // ---- Base de clientes importada de planilha (Placa -> Cliente) ----
+  var BASE_CLIENTES_KEY = "controle_veiculos_base_clientes";
+  var BASE_CLIENTES_META_KEY = "controle_veiculos_base_clientes_meta";
+
+  function normalizarCabecalho(s) {
+    return String(s || "").toUpperCase()
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .trim();
+  }
+
+  function acharColuna(headerRow, candidatos) {
+    for (var i = 0; i < headerRow.length; i++) {
+      var h = normalizarCabecalho(headerRow[i]);
+      for (var j = 0; j < candidatos.length; j++) {
+        if (h.indexOf(candidatos[j]) !== -1) return i;
+      }
+    }
+    return -1;
+  }
+
+  function processarLinhasBase(rows) {
+    if (!rows || rows.length < 2) {
+      return { erro: "Planilha vazia ou sem dados suficientes." };
+    }
+    var header = rows[0];
+    var colPlaca = acharColuna(header, ["PLACA"]);
+    var colCliente = acharColuna(header, ["CLIENTE", "NOME"]);
+
+    if (colPlaca === -1 || colCliente === -1) {
+      return { erro: "Não encontrei colunas 'Placa' e 'Cliente' nos cabeçalhos da planilha." };
+    }
+
+    var mapa = {};
+    var count = 0;
+    for (var i = 1; i < rows.length; i++) {
+      var row = rows[i];
+      if (!row) continue;
+      var placaRaw = row[colPlaca];
+      var clienteRaw = row[colCliente];
+      if (!placaRaw || !clienteRaw) continue;
+      var placa = formatPlate(String(placaRaw));
+      if (placa.length !== 7) continue;
+      mapa[placa] = String(clienteRaw).trim();
+      count++;
+    }
+
+    if (count === 0) {
+      return { erro: "Nenhuma linha válida encontrada (confira o formato das placas)." };
+    }
+    return { mapa: mapa, count: count };
+  }
+
+  function atualizarStatusBase() {
+    var meta = lsGet(BASE_CLIENTES_META_KEY);
+    var el = document.getElementById("baseClientesStatus");
+    if (meta && meta.count) {
+      var dt = new Date(meta.importedAt);
+      el.textContent = meta.count + " placas na base — importada em " +
+        dt.toLocaleDateString("pt-BR") + " às " + dt.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+      el.style.color = "var(--text-muted)";
+    } else {
+      el.textContent = "Nenhuma base importada ainda.";
+      el.style.color = "var(--text-faint)";
+    }
+  }
+
+  document.getElementById("importarBaseBtn").addEventListener("click", function () {
+    document.getElementById("importarBaseInput").click();
+  });
+
+  document.getElementById("importarBaseInput").addEventListener("change", function (e) {
+    var file = e.target.files && e.target.files[0];
+    if (!file) return;
+    var statusEl = document.getElementById("baseClientesStatus");
+    statusEl.textContent = "Lendo planilha...";
+    statusEl.style.color = "var(--text-faint)";
+
+    var reader = new FileReader();
+    reader.onload = function (ev) {
+      try {
+        var data = new Uint8Array(ev.target.result);
+        var workbook = XLSX.read(data, { type: "array" });
+        var firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+        var rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+        var resultado = processarLinhasBase(rows);
+
+        if (resultado.erro) {
+          statusEl.textContent = resultado.erro;
+          statusEl.style.color = "var(--red)";
+          return;
+        }
+
+        lsSet(BASE_CLIENTES_KEY, resultado.mapa);
+        lsSet(BASE_CLIENTES_META_KEY, { count: resultado.count, importedAt: new Date().toISOString() });
+        atualizarStatusBase();
+      } catch (err) {
+        statusEl.textContent = "Erro ao ler a planilha. Confira se é um .xlsx/.xls/.csv válido.";
+        statusEl.style.color = "var(--red)";
+      }
+    };
+    reader.readAsArrayBuffer(file);
+    e.target.value = "";
+  });
+
+  atualizarStatusBase();
 
   // ---- TCar integration: auto-fill Cliente by looking up the plate ----
   // Desativado nessa versão (hospedada no GitHub Pages) — a consulta ao TCar
