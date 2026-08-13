@@ -1,4 +1,4 @@
-const CACHE_NAME = "controle-veiculos-v11";
+const CACHE_NAME = "controle-veiculos-v12";
 const ASSETS = ["./index.html", "./manifest.json", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", (event) => {
