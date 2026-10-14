@@ -37,20 +37,24 @@
 
   @page { size: A4 landscape; margin: 10mm; }
 
-  .header { padding: 20px 18px 16px; border-bottom: 3px solid var(--blue-light); background: var(--panel); }
-  .title { font-family: 'Oswald', sans-serif; font-size: 26px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; }
-  .date { font-family: 'Inter', sans-serif; font-size: 13px; color: var(--text-muted); margin-top: 2px; text-transform: capitalize; }
+  .header { padding: 8px 14px 8px; border-bottom: 2px solid var(--blue-light); background: var(--panel); }
+  .header-row { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .title { font-family: 'Oswald', sans-serif; font-size: 19px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; line-height: 1.15; }
+  .date { font-family: 'Inter', sans-serif; font-size: 11px; color: var(--text-muted); text-transform: capitalize; white-space: nowrap; }
   .subnote { font-family: 'Inter', sans-serif; font-size: 11.5px; color: var(--text-faint); margin-top: 2px; }
-  .stats { display: flex; gap: 10px; margin-top: 14px; }
-  .stat-box { flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 10px 8px; text-align: center; }
-  .stat-val { font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 700; }
-  .stat-label { font-family: 'Inter', sans-serif; font-size: 10.5px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px; }
+  .stats { display: flex; gap: 6px; margin-top: 6px; }
+  .stat-box { flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 3px 4px; display: flex; align-items: baseline; justify-content: center; gap: 5px; }
+  .stat-val { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; }
+  .stat-label { font-family: 'Inter', sans-serif; font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.03em; }
 
-  .controls { padding: 16px 18px 0; }
+  .controls { padding: 8px 14px 0; display: flex; gap: 8px; }
   .input { width: 100%; box-sizing: border-box; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border); background: var(--card); color: var(--text); font-size: 15px; outline: none; }
   .select { width: 100%; box-sizing: border-box; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--card-alt); color: var(--text); font-size: 14px; outline: none; }
 
-  .list-wrap { padding: 16px 18px 110px; }
+  .controls .input { padding: 9px 12px; font-size: 14px; flex: 1; min-width: 0; }
+  .btn-clear { flex-shrink: 0; padding: 0 12px; border-radius: 10px; border: 1px solid var(--amber); background: transparent; color: var(--amber); font-family: 'Oswald', sans-serif; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.03em; line-height: 1.1; }
+  .btn-clear.confirm { background: var(--amber); color: #052038; }
+  .list-wrap { padding: 8px 14px 90px; }
   .empty { text-align: center; color: var(--text-faint); margin-top: 60px; font-size: 14px; }
 
   .table-container { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; background: var(--card); }
@@ -68,16 +72,16 @@
 
   .pill { border-radius: 999px; padding: 4px 10px; font-size: 12px; font-weight: 600; border-width: 1px; border-style: solid; display: inline-block; }
 
-  .vcard { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px; margin-bottom: 8px; }
-  .vcard-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-  .vcard-plate { font-family: 'JetBrains Mono', monospace; color: var(--blue-light); font-size: 17px; font-weight: 700; letter-spacing: 0.06em; }
-  .vcard-check { width: 22px; height: 22px; flex-shrink: 0; accent-color: var(--blue-light); cursor: pointer; }
-  .vcard-client { font-family: 'Oswald', sans-serif; font-size: 14.5px; font-weight: 600; margin-top: 2px; }
-  .vcard-pills { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
-  .vcard-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--border); }
-  .vcard-user { font-size: 11px; color: var(--text-muted); }
-  .vcard-actions { display: flex; gap: 14px; }
-  .vcard.conferido { border-color: var(--green); background: linear-gradient(var(--card), var(--card)) padding-box, var(--card); box-shadow: inset 0 0 0 1px rgba(79,154,107,0.35); }
+  .vcard { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 6px 10px; margin-bottom: 5px; }
+  .vcard-top { display: flex; align-items: center; gap: 10px; }
+  .vcard-plate { font-family: 'JetBrains Mono', monospace; color: var(--blue-light); font-size: 15px; font-weight: 700; letter-spacing: 0.05em; flex-shrink: 0; }
+  .vcard-client { font-family: 'Oswald', sans-serif; font-size: 13.5px; font-weight: 600; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .vcard-check { width: 24px; height: 24px; flex-shrink: 0; accent-color: var(--blue-light); cursor: pointer; }
+  .vcard-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 2px; }
+  .vcard-user { font-size: 10.5px; color: var(--text-muted); }
+  .vcard-actions { display: flex; gap: 16px; }
+  .vcard-actions .link-btn { padding: 2px 0; }
+  .vcard.conferido { border-color: var(--green); box-shadow: inset 0 0 0 1px rgba(79,154,107,0.35); }
 
   .row-actions { display: flex; gap: 12px; justify-content: flex-end; }
   .link-btn { background: none; border: none; font-size: 12px; font-weight: 600; padding: 0; }
@@ -117,18 +121,20 @@
 
 <div class="no-print">
   <div class="header">
-    <div class="title">Controle de Veículos</div>
-    <div class="date" id="todayLabel"></div>
-    <div class="subnote">Lista contínua — veículos que ainda estão na oficina permanecem aqui entre os dias</div>
+    <div class="header-row">
+      <div class="title">Controle de Veículos</div>
+      <div class="date" id="todayLabel"></div>
+    </div>
     <div class="stats">
       <div class="stat-box"><div class="stat-val" id="statNaoRealizado" style="color:var(--text-muted)">0</div><div class="stat-label">Não realizado</div></div>
       <div class="stat-box"><div class="stat-val" id="statAndamento" style="color:var(--blue-light)">0</div><div class="stat-label">Em andamento</div></div>
-      <div class="stat-box"><div class="stat-val" id="statTotal" style="color:var(--chrome)">0</div><div class="stat-label">Total na lista</div></div>
+      <div class="stat-box"><div class="stat-val" id="statTotal" style="color:var(--chrome)">0</div><div class="stat-label">Total</div></div>
     </div>
   </div>
 
   <div class="controls">
-    <input class="input" id="searchInput" placeholder="Buscar por cliente ou placa..." />
+    <input class="input" id="searchInput" placeholder="Buscar cliente ou placa..." />
+    <button class="btn-clear" id="clearConfBtn">Limpar<br />conferência</button>
   </div>
 
   <div class="list-wrap">
@@ -373,6 +379,13 @@
     });
   }
 
+  // Na tela: não conferidos no topo, conferidos no fim (cada grupo em ordem de placa)
+  function sortForScreen(list) {
+    return sortByPlate(list).sort(function (a, b) {
+      return (a.conferido ? 1 : 0) - (b.conferido ? 1 : 0);
+    });
+  }
+
   function formatPrintedAt() {
     return new Date().toLocaleString("pt-BR", {
       day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit"
@@ -380,7 +393,7 @@
   }
 
   function render() {
-    var filtered = sortByPlate(entries).filter(function (e) {
+    var filtered = sortForScreen(entries).filter(function (e) {
       var q = search.trim().toUpperCase();
       if (!q) return true;
       return e.clientName.toUpperCase().indexOf(q) !== -1 || e.plate.indexOf(q) !== -1;
@@ -416,15 +429,8 @@
       '<div class="' + cardClass + '">' +
       '<div class="vcard-top">' +
       '<span class="vcard-plate">' + displayPlate(entry.plate) + '</span>' +
+      '<span class="vcard-client">' + escapeHtml(entry.clientName) + '</span>' +
       '<input type="checkbox" class="vcard-check" data-action="toggle-conferido" data-id="' + entry.id + '" ' + checked + ' title="Conferido no pátio" />' +
-      '</div>' +
-      '<div class="vcard-client">' + escapeHtml(entry.clientName) + '</div>' +
-      '<div class="vcard-pills">' +
-      pillHtml(entry.tipoVeiculo, "var(--chrome)") +
-      pillHtml(entry.servico, servicoColor(entry.servico)) +
-      pillHtml(entry.chaveiro, "var(--chrome)") +
-      pillHtml(entry.retirada, retiradaColor(entry.retirada)) +
-      pillHtml(entry.assinatura, assinaturaColor(entry.assinatura)) +
       '</div>' +
       '<div class="vcard-footer">' +
       '<span class="vcard-user">' + escapeHtml(entry.usuarioCriacao || "") + '</span>' +
@@ -903,6 +909,25 @@
     closeDrawer();
     render();
   });
+
+  var clearBtn = document.getElementById("clearConfBtn");
+  var clearTimer = null;
+  clearBtn.addEventListener("click", function () {
+    if (!clearBtn.classList.contains("confirm")) {
+      clearBtn.classList.add("confirm");
+      clearBtn.innerHTML = "Confirmar?";
+      clearTimer = setTimeout(resetClearBtn, 3000);
+      return;
+    }
+    entries.forEach(function (e) { e.conferido = false; });
+    persist(); render();
+    resetClearBtn();
+  });
+  function resetClearBtn() {
+    clearTimeout(clearTimer);
+    clearBtn.classList.remove("confirm");
+    clearBtn.innerHTML = "Limpar<br />conferência";
+  }
 
   document.getElementById("newBtn").addEventListener("click", function () { openDrawer(null); });
   document.getElementById("searchInput").addEventListener("input", function (e) {
